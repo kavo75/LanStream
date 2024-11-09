@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LanStream by Karel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Flex container voor controls en video */
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap; /* Laat elementen wrappen op kleinere schermen */
+        }
+
+        /* Styling voor de controles */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 150px; /* Minimale breedte voor de controles */
+        }
+
+        /* Styling voor de videostream */
+        #videoStream {
+            width: 800px; /* Standaard breedte */
+            max-width: 100%; /* Responsief aanpassen */
+            height: auto; /* Behoud aspect ratio */
+            transform: rotate(180deg);
+            transition: transform 0.5s ease, width 0.5s ease;
+        }
+
+        /* Styling voor knoppen en dropdown */
+        button, select {
+            padding: 10px 20px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        /* Styling voor de header */
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Media query voor kleinere schermen */
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column; /* Stacks controls en video onder elkaar */
+                align-items: center;
+            }
+            .controls {
+                width: 100%;
+                max-width: 300px;
+            }
+            #videoStream {
+                max-width: 100%;
+            }
+        }
+
+        /* Extra Media Queries voor betere responsiviteit */
+        @media (min-width: 601px) and (max-width: 1200px) {
+            .container {
+                gap: 15px;
+            }
+            .controls {
+                min-width: 180px;
+            }
+            #videoStream {
+                max-width: 800px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
+
+        @media (min-width: 1201px) {
+            .container {
+                gap: 20px;
+            }
+            .controls {
+                min-width: 200px;
+            }
+            #videoStream {
+                max-width: 800px;
+            }
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>LanStream by Karel</h1>
+    <div class="container">
+        <div class="controls">
+            <button onclick="rotate()">Rotate</button>
+            <label for="quality">Kies kwaliteit:</label>
+            <select id="quality" onchange="setQuality()">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <img id="videoStream" src="http://192.168.7.253:8080/video" alt="Live Stream">
+    </div>
+
+    <script>
+        let rotation = 180; // Start met 180 graden
+
+        function rotate() {
+            rotation = (rotation + 90) % 360; // Rotatie met 90 graden
+            document.getElementById("videoStream").style.transform = `rotate(${rotation}deg)`; // Pas de CSS-transform toe
+        }
+
+        function setQuality() {
+            const quality = document.getElementById("quality").value;
+            const img = document.getElementById("videoStream");
+
+            // Stel de kwaliteit in via een fetch-verzoek
+            fetch(`http://192.168.7.253:8080/setQuality`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ quality: quality })
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log("Kwaliteit ingesteld op:", quality);
+                alert("Kwaliteit aangepast naar: " + quality);
+            })
+            .catch(error => console.error('Error:', error));
+
+            // Pas de breedte van de afbeelding aan op basis van de geselecteerde kwaliteit
+            if (quality === "low") {
+                img.style.width = "400px";  // Pas de breedte aan voor lage kwaliteit
+            } else if (quality === "medium") {
+                img.style.width = "800px";  // Standaard breedte voor medium kwaliteit
+            } else if (quality === "high") {
+                img.style.width = "800px";  // Hogere breedte voor hoge kwaliteit
+                img.style.height = "auto";   // Zorg ervoor dat de hoogte automatisch wordt aangepast
+            }
+        }
+    </script>
+</body>
+</html>
