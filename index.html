@@ -106,7 +106,7 @@
                 <option value="high">High</option>
             </select>
         </div>
-        <img id="videoStream" src="http://84.197.200.147:8080/video" alt="Live Stream">
+        <img id="videoStream" src="http://<PUBLIC IP HERE>:8080/video" alt="Live Stream">
     </div>
 
     <script>
@@ -122,7 +122,7 @@
             const img = document.getElementById("videoStream");
 
             // Stel de kwaliteit in via een fetch-verzoek
-            fetch(`http://84.197.200.147:8080/setQuality`, {
+            fetch(`http://<PUBLIC IP HERE>:8080/setQuality`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ quality: quality })
